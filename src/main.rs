@@ -36,7 +36,7 @@ fn bench_nacl() {
 }
 
 fn bench_dalek() {
-    use curve25519_dalek_ng::{scalar::Scalar, ristretto::RistrettoPoint};
+    use curve25519_dalek::{scalar::Scalar, ristretto::RistrettoPoint};
 
     let mut p = vec![];
     let mut s = vec![];

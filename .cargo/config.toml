@@ -1,2 +1,2 @@
 [build]
-rustflags = ['--cfg=curve25519_dalek_bits="u32"']
+rustflags = ['--cfg=curve25519_dalek_bits="32"']
