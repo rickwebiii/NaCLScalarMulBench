@@ -1,13 +1,14 @@
-use rust_sodium::crypto::scalarmult::curve25519::*;
 use std::mem::size_of;
 use rand::{thread_rng, RngCore};
 use std::time::Instant;
 
-fn main() {
+const LEN: usize = 128 * 1024;
+
+fn bench_nacl() {
+    use rust_sodium::crypto::scalarmult::curve25519::*;
+
     let mut g = vec![];
     let mut s = vec![];
-
-    const LEN: usize = 1024 * 1024;
 
     println!("Generating...");
 
@@ -23,13 +24,40 @@ fn main() {
         s.push(Scalar::from_slice(&buff).unwrap());
     }
 
-    println!("Bench...");
+    println!("Bench NaCl...");
 
     let now = Instant::now();
 
     for i in 0..LEN {
-        scalarmult(&s[i], &g[i]).unwrap();
+        let _ = scalarmult(&s[i], &g[i]).unwrap();
     }
 
     println!("{} mul/s", LEN as f64 / now.elapsed().as_secs_f64());
+}
+
+fn bench_dalek() {
+    use curve25519_dalek_ng::{scalar::Scalar, ristretto::RistrettoPoint};
+
+    let mut p = vec![];
+    let mut s = vec![];
+
+    for _ in 0..LEN {
+        p.push(RistrettoPoint::random(&mut thread_rng()));
+        s.push(Scalar::random(&mut thread_rng()));
+    }
+
+    println!("Bench Dalek...");
+
+    let now = Instant::now();
+
+    for i in 0..LEN {
+        let _ = p[i] * s[i];
+    }
+
+    println!("{} mul/s", LEN as f64 / now.elapsed().as_secs_f64());
+}
+
+fn main() {
+    bench_nacl();
+    bench_dalek();
 }
